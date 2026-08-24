@@ -98,6 +98,7 @@ class NetworkMetrics:
         self.bandwidth_allocation_events = 0
         self.beam_steering_events = 0
         self.compute_placement_events = 0
+        self.gateway_assignment_events = 0
 
     # ==========================================================
     # COMMUNICATION METRICS

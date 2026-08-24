@@ -93,20 +93,23 @@ class SimulationEnvironment:
                         break
                     path_latency += link.dynamic_latency
                 
+                if global_metrics:
+                    global_metrics.total_packets_sent += 1
+                    global_metrics.total_missions += 1
+                    global_metrics.total_service_time += 1 # service attempted
+                    if flow.priority <= 2:
+                        global_metrics.priority_missions += 1
+                        
                 if path_failed:
                     metrics["successful_packets"] -= 1
                     metrics["failed_packets"] += 1
                     if global_metrics:
-                        global_metrics.total_packets_sent += 1
-                        global_metrics.total_missions += 1
-                        global_metrics.total_service_time += 1 # service attempted
-                        if flow.priority <= 2:
-                            global_metrics.priority_missions += 1
-                        
                         # Incorrect prediction if we picked a failed path
                         global_metrics.total_intent_predictions += 1
                         global_metrics.total_coordination_events += 1
                     continue
+                    
+                metrics["successful_packets"] += 1
                     
                 metrics["total_latency_ms"] += path_latency
                 
@@ -118,8 +121,7 @@ class SimulationEnvironment:
                 efficiency = 1.0 - min((path_latency / flow.deadline_ms) * (1.0 / flow.priority), 1.0)
                 resource_efficiency_scores.append(efficiency)
                 
-                if global_metrics:
-                    global_metrics.total_packets_sent += 1
+                if global_metrics and not path_failed:
                     global_metrics.total_packets_delivered += 1
                     global_metrics.packet_delays.append(path_latency)
                     global_metrics.total_bits_delivered += flow.packet_size_kb * 8000
@@ -144,12 +146,10 @@ class SimulationEnvironment:
                     idle_time = 0.1
                     global_metrics.idle_energy_j += IDLE_POWER_W * idle_time
                     
-                    global_metrics.total_missions += 1
                     global_metrics.completed_missions += 1
                     global_metrics.mission_satisfaction_scores.append(efficiency)
                     
                     if flow.priority <= 2:
-                        global_metrics.priority_missions += 1
                         global_metrics.priority_missions_completed += 1
                     
                     global_metrics.total_intent_predictions += 1
