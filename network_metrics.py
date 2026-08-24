@@ -86,6 +86,19 @@ class NetworkMetrics:
         # -----------------------------
         self.convergence_step = None
 
+        # -----------------------------
+        # I-MACSI specific
+        # -----------------------------
+        self.intent_dissemination_messages = 0
+        self.resource_reorg_events = 0
+        self.encryption_events = 0
+        self.gateway_selections = 0
+        
+        self.joint_optimization_events = 0
+        self.bandwidth_allocation_events = 0
+        self.beam_steering_events = 0
+        self.compute_placement_events = 0
+
     # ==========================================================
     # COMMUNICATION METRICS
     # ==========================================================
@@ -407,6 +420,46 @@ class NetworkMetrics:
 
 
     # ==========================================================
+    # I-MACSI: INTENT DISSEMINATION OVERHEAD
+    # ==========================================================
+
+    def intent_dissemination_overhead(self):
+        """
+        Ratio of intent dissemination messages to total packets sent.
+        Lower is more efficient.
+        """
+        if self.total_packets_sent == 0:
+            return 0
+        return self.intent_dissemination_messages / self.total_packets_sent
+
+
+    # ==========================================================
+    # I-MACSI: RESOURCE REORGANIZATION RATE
+    # ==========================================================
+
+    def resource_reorganization_rate(self):
+        """
+        Resource reorganization events per packet.
+        Indicates how actively the swarm adapts its resources.
+        """
+        if self.total_packets_sent == 0:
+            return 0
+        return self.resource_reorg_events / self.total_packets_sent
+
+    # ==========================================================
+    # I-MACSI: JOINT OPTIMIZATION EVENTS
+    # ==========================================================
+
+    def joint_optimization_rate(self):
+        """
+        Graph optimization events (BW, beam, compute, gateway) per packet.
+        """
+        if self.total_packets_sent == 0:
+            return 0
+        return self.joint_optimization_events / self.total_packets_sent
+
+
+    # ==========================================================
     # COMPUTATIONAL COMPLEXITY
     # ==========================================================
 
@@ -517,5 +570,31 @@ class NetworkMetrics:
                     number_of_agents,
                     number_of_states,
                     number_of_actions
-                )
+                ),
+
+            # I-MACSI metrics
+
+            "intent_dissemination_overhead":
+                self.intent_dissemination_overhead(),
+
+            "resource_reorganization_rate":
+                self.resource_reorganization_rate(),
+
+            "encryption_events":
+                self.encryption_events,
+
+            "gateway_selections":
+                self.gateway_selections,
+                
+            "joint_optimization_rate":
+                self.joint_optimization_rate(),
+                
+            "bandwidth_allocation_events":
+                self.bandwidth_allocation_events,
+                
+            "beam_steering_events":
+                self.beam_steering_events,
+                
+            "compute_placement_events":
+                self.compute_placement_events,
         }

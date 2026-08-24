@@ -5,14 +5,29 @@ from simulation.failure import FailureModel
 from intent.mission_intent import IntentVector
 from network.isl_state import ISLState
 from learning.consensus import ConsensusEngine
+from routing.graph_optimizer import GraphOptimizer
 
 class SimulationEnvironment:
+    """
+    I-MACSI Simulation Environment.
+
+    Manages the simulation loop, triggers intent dissemination,
+    and tracks both conventional and I-MACSI-specific metrics
+    (dissemination overhead, resource reorganisation events).
+    """
+
     def __init__(self, topology: ConstellationTopology, q_manager: QRoutingManager, failure_model: FailureModel):
         self.topology = topology
         self.q_manager = q_manager
         self.failure_model = failure_model
         self.current_step = 0
         self.consensus_engine = ConsensusEngine(sync_interval=20, consensus_weight=0.2)
+        self.graph_optimizer = GraphOptimizer(topology)
+
+        # I-MACSI telemetry
+        self.intent_dissemination_messages = 0
+        self.resource_reorg_events = 0
+        self.joint_optimization_events = 0
         
     def step(self):
         """Advances the simulation clock by one tick."""
@@ -24,6 +39,7 @@ class SimulationEnvironment:
         """
         Simulates a batch of TrafficFlows across the network using a specific router manager.
         Tracks deep metrics including End-to-End latency, hops, PDR, Throughput, QoS Satisfaction, and Routing Overhead.
+        I-MACSI: Also tracks intent dissemination overhead and resource reorganisation events.
         """
         metrics = {
             "total_packets": len(flows),
@@ -41,17 +57,25 @@ class SimulationEnvironment:
         }
         
         resource_efficiency_scores = []
-        
+
+        # Snapshot dissemination counter before batch
+        dissem_before = 0
+        if hasattr(router_manager, 'intent_protocol') and router_manager.intent_protocol is not None:
+            dissem_before = router_manager.intent_protocol.total_messages_sent
+
         for flow in flows:
             self.step() # Advance simulation clock to trigger consensus periodically
             
-            # Route packet
+            # Route packet (I-MACSI: dissemination + 8D resource reorg happens inside)
             path, success = router_manager.route_packet(flow.source_id, flow.dest_id, flow.intent)
             metrics["routing_overhead"] += len(path) - 1 # Assuming 1 Q-update per hop
             
             if success:
                 metrics["successful_packets"] += 1
                 metrics["paths"].append(path)
+                
+                # I-MACSI: Joint Resource Optimization
+                allocation_plan = self.graph_optimizer.optimize(path, flow.intent)
                 
                 # Calculate metrics for the successful path
                 hops = len(path) - 1
@@ -163,6 +187,42 @@ class SimulationEnvironment:
             # Allow learning models to decay their exploration parameter if supported
             if hasattr(router_manager, 'decay_epsilon'):
                 router_manager.decay_epsilon()
+
+        # ---- I-MACSI: Aggregate dissemination and resource reorg metrics ----
+        if hasattr(router_manager, 'intent_protocol') and router_manager.intent_protocol is not None:
+            dissem_after = router_manager.intent_protocol.total_messages_sent
+            batch_dissem = dissem_after - dissem_before
+            self.intent_dissemination_messages += batch_dissem
+            if global_metrics:
+                global_metrics.intent_dissemination_messages += batch_dissem
+
+        # Aggregate resource reorg events from all satellites
+        batch_reorg = 0
+        batch_encrypt = 0
+        batch_gateway = 0
+        for node in self.topology.nodes.values():
+            batch_reorg += node.resource_reorg_events
+            batch_encrypt += node.encryption_events
+            batch_gateway += node.gateway_selections
+        self.resource_reorg_events = batch_reorg
+        
+        # Aggregate GraphOptimizer events
+        self.joint_optimization_events = (
+            self.graph_optimizer.bandwidth_allocation_events +
+            self.graph_optimizer.beam_steering_events +
+            self.graph_optimizer.compute_placement_events +
+            self.graph_optimizer.gateway_assignment_events
+        )
+        
+        if global_metrics:
+            global_metrics.resource_reorg_events = batch_reorg
+            global_metrics.encryption_events = batch_encrypt
+            global_metrics.gateway_selections = batch_gateway
+            global_metrics.joint_optimization_events += self.joint_optimization_events
+            global_metrics.bandwidth_allocation_events += self.graph_optimizer.bandwidth_allocation_events
+            global_metrics.beam_steering_events += self.graph_optimizer.beam_steering_events
+            global_metrics.compute_placement_events += self.graph_optimizer.compute_placement_events
+            global_metrics.gateway_assignment_events += self.graph_optimizer.gateway_assignment_events
                 
         # Calculate aggregate metrics
         if metrics["successful_packets"] > 0:

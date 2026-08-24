@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Intent = 'CRITICAL_DISASTER' | 'EARTH_OBSERVATION' | 'SECURE_MISSION';
+export type Intent = string;
 
 export interface SatCoords {
   lat: number;   // degrees
@@ -81,14 +81,31 @@ export const useSimulationStore = create<SimulationState>((set) => ({
     set((state) => ({ satelliteCoords: { ...state.satelliteCoords, [id]: coords } })),
 }));
 
-export const intentColors: Record<Intent, string> = {
+// I-MACSI: All 11 standard intents with distinct colors
+export const intentColors: Record<string, string> = {
+  LOW_LATENCY: '#00e5ff',
   CRITICAL_DISASTER: '#ff6b35',
   EARTH_OBSERVATION: '#00b4d8',
   SECURE_MISSION: '#c77dff',
+  ENVIRONMENTAL_MONITORING: '#66bb6a',
+  AUTONOMOUS_MARITIME: '#26c6da',
+  MILITARY_RECONNAISSANCE: '#ef5350',
+  GLOBAL_INTERNET: '#42a5f5',
+  REMOTE_HEALTHCARE: '#ff7043',
+  PRECISION_AGRI: '#9ccc65',
+  INDUSTRIAL_IOT: '#ffa726',
 };
 
-export const intentLabels: Record<Intent, string> = {
-  CRITICAL_DISASTER: 'Critical Disaster',
-  EARTH_OBSERVATION: 'Earth Observation',
-  SECURE_MISSION: 'Secure Mission',
+export const intentLabels: Record<string, string> = {
+  LOW_LATENCY: 'Low Latency',
+  CRITICAL_DISASTER: 'Disaster',
+  EARTH_OBSERVATION: 'Earth Obs',
+  SECURE_MISSION: 'Secure',
+  ENVIRONMENTAL_MONITORING: 'Env Monitor',
+  AUTONOMOUS_MARITIME: 'Maritime',
+  MILITARY_RECONNAISSANCE: 'Military',
+  GLOBAL_INTERNET: 'Internet',
+  REMOTE_HEALTHCARE: 'Healthcare',
+  PRECISION_AGRI: 'Agriculture',
+  INDUSTRIAL_IOT: 'IoT',
 };

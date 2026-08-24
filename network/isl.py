@@ -15,7 +15,40 @@ class InterSatelliteLink:
         # New attributes for Phase 2
         self.congestion_level = 0.0
         self.reliability = 0.999
-        
+
+        # I-MACSI: per-link encryption and energy modelling
+        self._encrypted_mode = False
+        self._tx_power_dbm = 30.0  # Inherited from endpoint satellite
+
+    @property
+    def encrypted_mode(self) -> bool:
+        return self._encrypted_mode
+
+    @encrypted_mode.setter
+    def encrypted_mode(self, value: bool):
+        self._encrypted_mode = value
+
+    @property
+    def encryption_overhead_ms(self) -> float:
+        """Additional latency incurred by encryption processing."""
+        if not self._encrypted_mode:
+            return 0.0
+        # 0.5–2.0 ms overhead depending on congestion
+        return 0.5 + self.congestion_level * 1.5
+
+    @property
+    def energy_cost(self) -> float:
+        """
+        Normalised energy cost for transmitting over this link.
+        Proportional to distance and current Tx power, inversely to bandwidth.
+        """
+        if self.state == ISLState.FAILED:
+            return float('inf')
+        # Linear model: energy ~ power_watts * (distance / speed_of_light)
+        power_watts = 10 ** ((self._tx_power_dbm - 30) / 10)  # dBm → Watts
+        propagation_time_s = self.base_distance / 3e5  # km / (km/s)
+        return power_watts * propagation_time_s * 1000  # milli-joules
+
     @property
     def dynamic_latency(self) -> float:
         if self.state == ISLState.FAILED:
@@ -27,7 +60,7 @@ class InterSatelliteLink:
         queue_delay = (utilization / (1 - utilization)) * 2.0 * (1.0 + self.congestion_level)
         jitter = random.uniform(0, 0.5)
         
-        total_latency = prop_delay + queue_delay + jitter
+        total_latency = prop_delay + queue_delay + jitter + self.encryption_overhead_ms
         return total_latency * 1.5 if self.state == ISLState.DEGRADED else total_latency
 
     @property

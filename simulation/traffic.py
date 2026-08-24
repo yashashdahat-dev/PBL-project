@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 import random
 from intent.mission_intent import IntentVector, StandardIntents
@@ -12,6 +12,7 @@ class TrafficFlow:
     packet_size_kb: float
     priority: int
     deadline_ms: float
+    application_category: str = "general"  # I-MACSI application category
 
 class TrafficGenerator:
     def __init__(self, topology: ConstellationTopology):
@@ -58,7 +59,8 @@ class TrafficGenerator:
             intent=intent,
             packet_size_kb=packet_size,
             priority=priority,
-            deadline_ms=deadline
+            deadline_ms=deadline,
+            application_category=intent.application_category,
         )
         
     def generate_batch(self, count: int) -> List[TrafficFlow]:

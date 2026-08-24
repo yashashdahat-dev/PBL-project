@@ -46,7 +46,7 @@ batch = traffic_gen.generate_batch(100)
 env.process_traffic_batch(batch, router, global_metrics)
 print(f"Pre-training complete. Epsilon: {router.epsilon:.4f}")
 
-# Map frontend intent strings to StandardIntents objects
+# I-MACSI: Map frontend intent strings to StandardIntents objects
 INTENT_MAP = {
     "LOW_LATENCY": StandardIntents.LOW_LATENCY,
     "CRITICAL_DISASTER": StandardIntents.CRITICAL_DISASTER,
@@ -148,19 +148,35 @@ def calculate_route():
 
 @app.route("/intent/extract", methods=["POST"])
 def extract_intent_endpoint():
+    """I-MACSI: Extract 8-dimensional intent vector from natural language."""
     data = request.json
     description = data.get("description", "")
     
     extracted = IntentExtractionEngine.extract_intent(description)
     
-    return jsonify({
-        "name": extracted.name,
-        "w_latency": round(extracted.w_latency, 2),
-        "w_throughput": round(extracted.w_throughput, 2),
-        "w_reliability": round(extracted.w_reliability, 2),
-        "w_congestion": round(extracted.w_congestion, 2),
-        "priority": extracted.priority
-    })
+    return jsonify(extracted.to_dict())
+
+@app.route("/intent/dissemination", methods=["GET"])
+def get_dissemination_state():
+    """I-MACSI: Returns the current intent cache state across the constellation."""
+    state = {}
+    for sat_id, node in topology.nodes.items():
+        cached_intents = {}
+        for flow_key, intent_vec in node.active_intents.items():
+            cached_intents[flow_key] = intent_vec.to_dict()
+        state[sat_id] = {
+            "cached_intents_count": len(node.active_intents),
+            "neighborhood_summary": node.neighborhood_intent_summary,
+            "cached_intents": cached_intents,
+            "resource_reorg_events": node.resource_reorg_events,
+            "encryption_events": node.encryption_events,
+            "gateway_selections": node.gateway_selections,
+        }
+    protocol_stats = {
+        "total_messages_sent": router.intent_protocol.total_messages_sent,
+        "total_messages_received": router.intent_protocol.total_messages_received,
+    }
+    return jsonify({"satellites": state, "protocol": protocol_stats})
 
 @app.route("/simulate/failure", methods=["POST"])
 def simulate_failure():

@@ -32,3 +32,14 @@ class ConstellationTopology:
             link_ba = InterSatelliteLink(node_b, node_a, distance, max_bw_mbps=1000.0)
             self.nodes[node_a].add_neighbor(node_b, link_ab)
             self.nodes[node_b].add_neighbor(node_a, link_ba)
+
+    def is_gateway_candidate(self, sat_id: str) -> bool:
+        """
+        I-MACSI gateway selection heuristic.
+        Satellites at the first or last orbital plane are candidates
+        for Earth-gateway downlink (closer to ground stations).
+        """
+        node = self.nodes.get(sat_id)
+        if node is None:
+            return False
+        return node.plane_id == 0 or node.plane_id == self.num_planes - 1

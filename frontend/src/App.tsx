@@ -30,6 +30,7 @@ function App() {
   const [isRouting, setIsRouting] = useState(false);
   const [isTraining, setIsTraining] = useState(false);
   const [trainingStats, setTrainingStats] = useState<{ pdr?: number; avg_latency_ms?: number; epsilon?: number } | null>(null);
+  const [intentVector, setIntentVector] = useState<Record<string, number> | null>(null);
 
   // Fetch initial network state from backend
   useEffect(() => {
@@ -131,6 +132,18 @@ function App() {
       if (data.route) {
         setActiveRoute(data.route);
         addEvent(`Route: ${source}→${destination} | ${data.hops} hops`, 'route');
+      }
+      // I-MACSI: Fetch 8D intent vector for custom intents
+      if (!(intent in intentLabels)) {
+        try {
+          const ivRes = await fetch(`${API}/intent/extract`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: intent }),
+          });
+          const ivData = await ivRes.json();
+          setIntentVector(ivData);
+        } catch { /* ignore */ }
       }
     } catch {
       // Demo mode
@@ -300,22 +313,56 @@ function App() {
               </div>
             </div>
 
-            {/* Intent selector */}
+            {/* I-MACSI Intent selector */}
             <div className="intent-row">
-              <label className="selector-label">MISSION INTENT</label>
-              <div className="intent-pills">
-                {(['LOW_LATENCY', 'CRITICAL_DISASTER', 'EARTH_OBSERVATION', 'SECURE_MISSION'] as Intent[]).map(i => (
+              <label className="selector-label">I-MACSI MISSION INTENT</label>
+              <input
+                type="text"
+                className="hud-select"
+                style={{ cursor: 'text', marginBottom: '4px' }}
+                placeholder="Describe intent (e.g. 'encrypted military drone surveillance')"
+                value={intent}
+                onChange={e => {
+                  setIntent(e.target.value);
+                  setIntentVector(null);
+                }}
+              />
+              <div className="intent-pills" style={{ flexWrap: 'wrap' }}>
+                {Object.keys(intentLabels).map(i => (
                   <button
                     key={i}
                     className={`intent-pill ${intent === i ? 'active' : ''}`}
-                    style={{ '--pill-color': intentColors[i] } as React.CSSProperties}
-                    onClick={() => setIntent(i)}
+                    style={{ '--pill-color': intentColors[i] || '#64ffda' } as React.CSSProperties}
+                    onClick={() => { setIntent(i); setIntentVector(null); }}
                   >
-                    {intentLabels[i]}
+                    {intentLabels[i] || i}
                   </button>
                 ))}
               </div>
             </div>
+
+            {/* I-MACSI 8D Intent Vector Display */}
+            {intentVector && (
+              <div className="route-display" style={{ marginBottom: '10px' }}>
+                <div className="route-label">8D INTENT VECTOR</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 12px', fontFamily: 'var(--text-mono)', fontSize: '0.62rem' }}>
+                  {['w_latency', 'w_throughput', 'w_reliability', 'w_congestion', 'w_energy', 'w_security', 'w_coverage', 'w_compute'].map(dim => {
+                    const val = intentVector[dim] ?? 0;
+                    const label = dim.replace('w_', '').toUpperCase();
+                    const barColor = val > 0.3 ? '#64ffda' : val > 0.1 ? '#546e7a' : '#1a2a3a';
+                    return (
+                      <div key={dim} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '70px', color: 'var(--text-dim)' }}>{label}</span>
+                        <div style={{ flex: 1, height: '6px', background: '#0a1628', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${Math.min(val * 100, 100)}%`, height: '100%', background: barColor, borderRadius: '3px', transition: 'width 0.3s' }} />
+                        </div>
+                        <span style={{ width: '32px', textAlign: 'right', color: 'var(--text-primary)' }}>{(val * 100).toFixed(0)}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Action buttons */}
             <div className="action-row">

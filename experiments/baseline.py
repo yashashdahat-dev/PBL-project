@@ -15,7 +15,7 @@ def run_baseline_comparison():
     config = Config()
     
     print("=" * 80)
-    print(" BASELINE ROUTING ALGORITHM COMPARISON ")
+    print(" BASELINE ROUTING ALGORITHM COMPARISON (I-MACSI vs Baselines) ")
     print("=" * 80)
     
     # Generate common topology
@@ -48,13 +48,12 @@ def run_baseline_comparison():
     res_p_train = env_proposed.process_traffic_batch(train_batch, proposed_router)
     
     print("\n[TRAINING RESULTS]")
-    print(f"{'Metric':<25} | {'Dijkstra (Baseline)':<20} | {'Basic Q-Routing':<20} | {'Proposed AI-Native':<20}")
+    print(f"{'Metric':<25} | {'Dijkstra (Baseline)':<20} | {'Basic Q-Routing':<20} | {'I-MACSI (Proposed)':<20}")
     print("-" * 90)
     print(f"{'PDR':<25} | {res_d_train['pdr']:.2%} | {res_b_train['pdr']:.2%} | {res_p_train['pdr']:.2%}")
     print(f"{'Avg Latency (ms)':<25} | {res_d_train['avg_latency_ms']:.2f} | {res_b_train['avg_latency_ms']:.2f} | {res_p_train['avg_latency_ms']:.2f}")
     print(f"{'Avg Hops':<25} | {res_d_train['avg_hops']:.2f} | {res_b_train['avg_hops']:.2f} | {res_p_train['avg_hops']:.2f}")
     print(f"{'Mission Completion':<25} | {res_d_train.get('mission_completion_ratio', 0.0):.2%} | {res_b_train.get('mission_completion_ratio', 0.0):.2%} | {res_p_train.get('mission_completion_ratio', 0.0):.2%}")
-    print(f"{'Resource Efficiency':<25} | {res_d_train.get('adaptive_resource_allocation_efficiency', 0.0):.2%} | {res_b_train.get('adaptive_resource_allocation_efficiency', 0.0):.2%} | {res_p_train.get('adaptive_resource_allocation_efficiency', 0.0):.2%}")
     
     # ---------------------------------------------------------
     # PHASE 2: Performance under Link Failure
@@ -78,13 +77,10 @@ def run_baseline_comparison():
     res_p_fail = env_proposed.process_traffic_batch(fail_batch, proposed_router)
     
     print("\n[FAILURE RESULTS]")
-    print(f"{'Metric':<25} | {'Dijkstra (Baseline)':<20} | {'Basic Q-Routing':<20} | {'Proposed AI-Native':<20}")
+    print(f"{'Metric':<25} | {'Dijkstra (Baseline)':<20} | {'Basic Q-Routing':<20} | {'I-MACSI (Proposed)':<20}")
     print("-" * 90)
     print(f"{'PDR':<25} | {res_d_fail['pdr']:.2%} | {res_b_fail['pdr']:.2%} | {res_p_fail['pdr']:.2%}")
     print(f"{'Avg Latency (ms)':<25} | {res_d_fail['avg_latency_ms']:.2f} | {res_b_fail['avg_latency_ms']:.2f} | {res_p_fail['avg_latency_ms']:.2f}")
-    print(f"{'Avg Hops':<25} | {res_d_fail['avg_hops']:.2f} | {res_b_fail['avg_hops']:.2f} | {res_p_fail['avg_hops']:.2f}")
-    print(f"{'Mission Completion':<25} | {res_d_fail.get('mission_completion_ratio', 0.0):.2%} | {res_b_fail.get('mission_completion_ratio', 0.0):.2%} | {res_p_fail.get('mission_completion_ratio', 0.0):.2%}")
-    print(f"{'Resource Efficiency':<25} | {res_d_fail.get('adaptive_resource_allocation_efficiency', 0.0):.2%} | {res_b_fail.get('adaptive_resource_allocation_efficiency', 0.0):.2%} | {res_p_fail.get('adaptive_resource_allocation_efficiency', 0.0):.2%}")
     
     # Save to CSV
     metrics_list = []
@@ -97,7 +93,7 @@ def run_baseline_comparison():
     res_b_train["phase"] = "Training"
     metrics_list.append(res_b_train)
     
-    res_p_train["algorithm"] = "Proposed AI-Native"
+    res_p_train["algorithm"] = "I-MACSI"
     res_p_train["phase"] = "Training"
     metrics_list.append(res_p_train)
     
@@ -109,13 +105,14 @@ def run_baseline_comparison():
     res_b_fail["phase"] = "Failure"
     metrics_list.append(res_b_fail)
     
-    res_p_fail["algorithm"] = "Proposed AI-Native"
+    res_p_fail["algorithm"] = "I-MACSI"
     res_p_fail["phase"] = "Failure"
     metrics_list.append(res_p_fail)
     
     from results.metrics_recorder import MetricsRecorder
     recorder = MetricsRecorder()
     recorder.record_metrics("baseline_comparison", metrics_list)
+    print("\nBaseline comparison complete. Results saved to baseline_comparison.csv")
 
 if __name__ == "__main__":
     run_baseline_comparison()
