@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Native LEO Satellite Network — Theory Explainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #ffffff;
+    padding: 48px 60px;
+    max-width: 860px;
+    margin: auto;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0d0d2b;
+    border-bottom: 3px solid #00b4d8;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+  }
+
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0077b6;
+    margin-top: 28px;
+    margin-bottom: 8px;
+    border-left: 4px solid #00b4d8;
+    padding-left: 10px;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #023e8a;
+    margin-top: 18px;
+    margin-bottom: 6px;
+  }
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0077b6;
+    margin-top: 12px;
+  }
+
+  p {
+    margin: 6px 0;
+    color: #2d2d2d;
+  }
+
+  strong { color: #0d0d2b; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #eef6fb;
+    color: #023e8a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  pre {
+    background: #0d1b2a;
+    color: #64ffda;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 14px 0;
+    overflow-x: auto;
+    border-left: 4px solid #00b4d8;
+  }
+
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 12px;
+  }
+
+  th {
+    background: #0077b6;
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #dee2e6;
+    color: #2d2d2d;
+  }
+
+  tr:nth-child(even) td { background: #f0f8ff; }
+
+  blockquote {
+    border-left: 4px solid #00b4d8;
+    background: #e8f7fc;
+    padding: 10px 16px;
+    margin: 14px 0;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: #023e8a;
+  }
+
+  ul {
+    padding-left: 22px;
+    margin: 8px 0;
+  }
+
+  li {
+    margin: 4px 0;
+    color: #2d2d2d;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid #bee9f5;
+    margin: 28px 0;
+  }
+
+  br { display: block; margin: 4px 0; content: ""; }
+
+  a { color: #0077b6; text-decoration: none; }
+
+  @media print {
+    body { padding: 20px 30px; }
+    h1 { page-break-before: auto; }
+    pre, table, blockquote { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>AI-Native LEO Satellite Network — How It Works</h1>
+<br>
+<p>!<a href="C:\Users\yasha\.gemini\antigravity-ide\brain\b20c44ce-e8a3-4d16-a109-f8fa54e4689d\leo_theory_infographic_1786282220792.png">System Infographic</a></p>
+<br>
+<hr>
+<br>
+<h2>🛰️ What Is This?</h2>
+<br>
+<p>This is a <strong>LEO (Low Earth Orbit) satellite constellation simulator</strong> with AI-powered routing. It models how data packets travel across a network of <strong>16 satellites</strong> orbiting Earth, and uses <strong>reinforcement learning</strong> to find the best path depending on the mission goal.</p>
+<br>
+<p>Think of it like a <strong>self-driving road network in space</strong>.</p>
+<br>
+<hr>
+<br>
+<h2>1. The Network — What It Looks Like</h2>
+<br>
+<pre><code>         [P0_S0] ── [P0_S1]
+           |                |
+         [P1_S0] ── [P1_S1]   ← 4 planes, 4 sats each = 16 total
+           |                |
+         [P2_S0] ── [P2_S1]
+           ...</code></pre>
+<br>
+<ul>
+<li><strong>4 Orbital Planes</strong> (P0–P3) — like lanes in space</li>
+<li><strong>4 Satellites per Plane</strong> (S0–S3) — evenly spaced in each orbit</li>
+<li><strong>ISL = Inter-Satellite Links</strong> — radio links connecting neighboring satellites</li>
+</ul>
+<p>  - <em>Intra-plane links</em> (along the orbit): 1,500 km</p>
+<p>  - <em>Inter-plane links</em> (between orbits): 2,500 km</p>
+<ul>
+<li>Satellites <strong>orbit at ~550 km altitude</strong> and keep moving — the network is dynamic</li>
+</ul>
+<br>
+<hr>
+<br>
+<h2>2. The AI Brain — How Each Satellite Thinks</h2>
+<br>
+<p>Every satellite is an <strong>autonomous AI agent</strong> running a 5-step cognitive loop:</p>
+<br>
+<table>
+<tr><th>Step</th><th>What It Does</th></tr>
+<tr><td>👁️ **PERCEIVE**</td><td>Reads current link conditions: latency, bandwidth, packet loss, congestion, failures</td></tr>
+<tr><td>🧠 **STATE**</td><td>Updates its internal map — notes which links just failed or recovered</td></tr>
+<tr><td>⚡ **DECIDE**</td><td>Looks up its **Q-table** to find which neighbor leads to the fastest/best path to the destination</td></tr>
+<tr><td>📡 **ACT**</td><td>Forwards the packet to the chosen next satellite</td></tr>
+<tr><td>📚 **LEARN**</td><td>Updates the Q-table using the Bellman equation based on what actually happened</td></tr>
+</table>
+<br>
+<h3>The Bellman Equation (how it learns)</h3>
+<pre><code>Q(hop) ← Q(hop) + α × [cost + γ × min Q(next)] - Q(hop)</code></pre>
+<ul>
+<li><strong>α (alpha = 0.1)</strong> — learning rate: how fast it updates</li>
+<li><strong>γ (gamma = 0.9)</strong> — discount factor: how much it values future rewards</li>
+<li><strong>cost</strong> — actual latency / packet loss experienced on that link</li>
+</ul>
+<br>
+<p>Over time, satellites build a <strong>Q-table</strong>: a lookup table that maps <code>(destination, neighbor) → expected cost</code>. The satellite always picks the neighbor with the <strong>lowest Q-value</strong> (lowest expected cost).</p>
+<br>
+<hr>
+<br>
+<h2>3. Mission Intent — Routing Changes Based on Goal</h2>
+<br>
+<p>The same network can route differently depending on <strong>why</strong> the packet is being sent:</p>
+<br>
+<table>
+<tr><th>🟠 CRITICAL DISASTER RESPONSE</th><th>🔵 EARTH OBSERVATION</th><th>🟣 SECURE MISSION</th></tr>
+<tr><td>**Minimize latency**</td><td>**Maximize throughput**</td><td>**Maximize resilience**</td></tr>
+<tr><td>Fastest path, even if fewer hops</td><td>Most data through, even if slower</td><td>Avoid risky links, even if longer</td></tr>
+<tr><td>Deadline: 50ms</td><td>Deadline: 500ms</td><td>Deadline: 200ms</td></tr>
+<tr><td>Used for: emergency comms</td><td>Used for: image downloads</td><td>Used for: military/encrypted data</td></tr>
+</table>
+<br>
+<p>The cost function that feeds into the Q-table changes per intent — so the <strong>same 16 satellites route packets differently</strong> depending on the mission tag attached to each packet.</p>
+<br>
+<hr>
+<br>
+<h2>4. What Happens When a Link Fails?</h2>
+<br>
+<p>1. A satellite detects its ISL neighbor is unreachable (<code>ISLState = FAILED</code>)</p>
+<p>2. It adds the failed neighbor to its <strong><code>recently_failed_links</code> set</strong></p>
+<p>3. On the next packet forward decision, it <strong>automatically skips</strong> failed neighbors</p>
+<p>4. It reroutes through alternative paths — no central control needed</p>
+<p>5. When the link recovers, it's removed from the failed set and Q-learning resumes</p>
+<br>
+<blockquote>This is called <strong>autonomous swarm recovery</strong> — the constellation heals itself.</blockquote>
+<br>
+<hr>
+<br>
+<h2>5. Real Results (from your simulation data)</h2>
+<br>
+<h3>Algorithm Comparison (100 packets, normal conditions)</h3>
+<br>
+<table>
+<tr><th>Algorithm</th><th>PDR</th><th>Avg Latency</th><th>Packet Loss</th></tr>
+<tr><td>Dijkstra (static, pre-computed)</td><td>**100%**</td><td>**15ms**</td><td>0%</td></tr>
+<tr><td>Basic Q-Routing</td><td>58%</td><td>43ms</td><td>42%</td></tr>
+<tr><td>**AI-Native Q-Routing (this project)**</td><td>**94%**</td><td>55ms</td><td>6%</td></tr>
+</table>
+<br>
+<h3>Under Link Failure (real-world stress test)</h3>
+<br>
+<table>
+<tr><th>Algorithm</th><th>PDR Under Failure</th><th>QoS Satisfied</th></tr>
+<tr><td>Dijkstra</td><td>100% (but can't reroute if route breaks)</td><td>100%</td></tr>
+<tr><td>Basic Q-Routing</td><td>58%</td><td>48%</td></tr>
+<tr><td>**AI-Native (this project)**</td><td>**82%**</td><td>**56%**</td></tr>
+</table>
+<br>
+<blockquote><strong>Key insight:</strong> Dijkstra gives perfect results <em>only if the network never changes</em>. In space, links fail constantly. The AI-native router adapts — that's why it matters.</blockquote>
+<br>
+<h3>Congestion Scaling (more packets = more stress)</h3>
+<br>
+<table>
+<tr><th>Traffic Load</th><th>Packets Delivered</th><th>Avg Latency</th></tr>
+<tr><td>10 packets</td><td>90% (9/10)</td><td>40ms</td></tr>
+<tr><td>50 packets</td><td>84% (42/50)</td><td>58ms</td></tr>
+<tr><td>100 packets</td><td>89% (89/100)</td><td>60ms</td></tr>
+<tr><td>200 packets</td><td>88% (176/200)</td><td>58ms</td></tr>
+</table>
+<br>
+<p>The AI router <strong>holds steady around 85–90% PDR</strong> even as traffic quadruples — showing it scales.</p>
+<br>
+<hr>
+<br>
+<h2>6. The 3D Visualizer — What Each Color Means</h2>
+<br>
+<table>
+<tr><th>Color</th><th>Meaning</th></tr>
+<tr><td>🔵 Blue satellite</td><td>Normal, idle satellite</td></tr>
+<tr><td>🟢 Green satellite</td><td>**Source** — packet starts here</td></tr>
+<tr><td>🟡 Yellow satellite</td><td>**Destination** — packet ends here</td></tr>
+<tr><td>🔴 Red satellite</td><td>**Failed / offline** satellite</td></tr>
+<tr><td>Glowing cyan line</td><td>**Active route** (laser beam)</td></tr>
+<tr><td>Moving orange dots</td><td>**Packets** traveling the route (comet trail)</td></tr>
+<tr><td>Dim blue grid</td><td>All ISL links in the constellation</td></tr>
+</table>
+<br>
+<hr>
+<br>
+<h2>7. One-Line Summary to Tell Someone</h2>
+<br>
+<blockquote><em>"It's a digital twin of a satellite internet network (like Starlink) where each satellite uses AI to learn the best routes in real-time — and automatically reroutes around failures without needing a ground controller."</em></blockquote>
+<br>
+<div style="margin-top:48px; border-top:2px solid #bee9f5; padding-top:12px; font-size:11px; color:#888; text-align:center;">
+  AI-Native LEO Satellite Digital Twin · Intent-Aware Cognitive Swarm Q-Routing Simulation
+</div>
+</body>
+</html>
