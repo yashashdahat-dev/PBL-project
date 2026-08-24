@@ -8,7 +8,18 @@ Next-generation Low Earth Orbit (LEO) mega-constellations face unprecedented cha
 
 Every communication request is first processed by an **Intent Understanding Engine** that extracts semantic information across 8 dimensions: latency sensitivity, throughput demand, reliability requirements, congestion avoidance, energy constraints, security level, geographic coverage, and computational demand. These semantic representations are transformed into an 8-dimensional **Mission Intent Vector**, which is distributed among neighboring satellites through an **Intent Dissemination Protocol** (gossip-style, TTL=2).
 
-Each satellite operates as an intelligent swarm agent using **Multi-Agent Reinforcement Learning** combined with distributed graph optimization. Instead of maximizing a fixed reward function, every agent continuously updates its reward according to the active mission intent through **dynamic reward shaping**, while maintaining global coordination through **decentralized consensus learning** (FedMARL with intent cache sharing). The swarm collectively reorganizes routing paths, inter-satellite links, transmission power, computational offloading, beam allocation, encryption mode, and gateway selection to maximize **mission success** rather than purely communication efficiency.
+The swarm collectively reorganizes routing paths, inter-satellite links, transmission power, computational offloading, beam allocation, encryption mode, and gateway selection to maximize **mission success** rather than purely communication efficiency.
+
+## Expected Contributions
+
+The I-MACSI architecture introduces a completely new paradigm of mission-aware autonomous satellite networking by integrating semantic communication concepts with distributed artificial intelligence and swarm optimization. Key contributions demonstrated in this codebase include:
+
+1. **Mission Intent Representation Framework**: The 8D `IntentVector` mapping natural language mission objectives into quantitative optimization constraints (`intent/mission_intent.py`).
+2. **Adaptive Semantic Reward Formulation**: A dynamic `QLearningEngine` where the reward function is continuously modulated by the active mission intent, escaping the limitations of fixed-reward RL (`learning/q_learning.py`).
+3. **Decentralized Multi-Agent Cognitive Swarm Algorithm**: Gossip-style intent dissemination (`intent/intent_dissemination.py`) and FedMARL consensus learning (`learning/consensus.py`) driving neighborhood awareness.
+4. **Hybrid AI-Optimization Architecture**: Seamlessly blending decentralized Q-Routing (`routing/q_routing.py`) with a greedy joint resource graph optimizer (`routing/graph_optimizer.py`) capable of autonomously reorganizing routing, bandwidth, beams, compute, and gateways based on changing mission objectives.
+
+Collectively, these contributions provide new optimization formulations for mission-oriented resource allocation, demonstrating improved adaptability under heterogeneous application scenarios, and establishing a foundation for future AI-native satellite communication architectures that prioritize intelligent mission fulfillment.
 
 ## Architecture Diagram
 
