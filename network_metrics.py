@@ -125,10 +125,10 @@ class NetworkMetrics:
         if self.total_packets_sent == 0:
             return 0
 
-        return (
+        return min(100.0, (
             self.total_packets_delivered /
             self.total_packets_sent
-        ) * 100
+        ) * 100)
 
 
     # ==========================================================

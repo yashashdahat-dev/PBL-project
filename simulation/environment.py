@@ -71,7 +71,6 @@ class SimulationEnvironment:
             metrics["routing_overhead"] += len(path) - 1 # Assuming 1 Q-update per hop
             
             if success:
-                metrics["successful_packets"] += 1
                 metrics["paths"].append(path)
                 
                 # I-MACSI: Joint Resource Optimization
@@ -91,7 +90,12 @@ class SimulationEnvironment:
                     if not link or link.state == ISLState.FAILED:
                         path_failed = True
                         break
-                    path_latency += link.dynamic_latency
+                    
+                    # Compute latency impact: node_a processing delay
+                    node_compute_load = self.topology.nodes[node_a].computational_load
+                    compute_delay = (node_compute_load / max(0.01, 1 - node_compute_load)) * 0.5 
+                    
+                    path_latency += link.dynamic_latency + compute_delay
                 
                 if global_metrics:
                     global_metrics.total_packets_sent += 1
@@ -101,7 +105,6 @@ class SimulationEnvironment:
                         global_metrics.priority_missions += 1
                         
                 if path_failed:
-                    metrics["successful_packets"] -= 1
                     metrics["failed_packets"] += 1
                     if global_metrics:
                         # Incorrect prediction if we picked a failed path
@@ -134,9 +137,14 @@ class SimulationEnvironment:
                     global_metrics.used_bandwidth_hz += allocated_bandwidth
 
                     # Energy consumption
-                    TX_POWER_W = 20
                     packet_transmission_time = 0.002
-                    global_metrics.transmission_energy_j += TX_POWER_W * packet_transmission_time
+                    path_tx_energy = 0.0
+                    for i in range(len(path) - 1):
+                        link = self.topology.nodes[path[i]].isl_interfaces.get(path[i+1])
+                        if link:
+                            power_watts = 10 ** ((link._tx_power_dbm - 30) / 10)
+                            path_tx_energy += power_watts * packet_transmission_time
+                    global_metrics.transmission_energy_j += path_tx_energy
                     
                     CPU_POWER_W = 5
                     computation_time = 0.001
