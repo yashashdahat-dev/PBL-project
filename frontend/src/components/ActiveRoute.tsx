@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { satellitePositions } from '../store';
@@ -12,6 +12,8 @@ interface ActiveRouteProps {
 const _p1  = new THREE.Vector3();
 const _p2  = new THREE.Vector3();
 const _end = new THREE.Vector3();
+
+const MAX_HOPS = 32;
 
 export default function ActiveRoute({ route }: ActiveRouteProps) {
   const lineRef     = useRef<THREE.LineSegments>(null);
@@ -36,9 +38,9 @@ export default function ActiveRoute({ route }: ActiveRouteProps) {
     prevRouteKey.current = routeKey;
   }
 
-  // Pre-allocated buffers sized for max segments
-  const positions     = useMemo(() => new Float32Array(linkPairs.length * 6), [linkPairs.length]);
-  const glowPositions = useMemo(() => new Float32Array(linkPairs.length * 6), [linkPairs.length]);
+  // Pre-allocated fixed buffers — never resized on GPU
+  const positions     = useMemo(() => new Float32Array(MAX_HOPS * 6), []);
+  const glowPositions = useMemo(() => new Float32Array(MAX_HOPS * 6), []);
 
   useFrame((_, delta) => {
     if (linkPairs.length === 0) return;
@@ -49,9 +51,10 @@ export default function ActiveRoute({ route }: ActiveRouteProps) {
 
     const visibleFull    = Math.floor(drawProgressRef.current);
     const partialFrac    = drawProgressRef.current - visibleFull;
+    const count          = Math.min(linkPairs.length, MAX_HOPS);
 
     let i = 0;
-    for (let idx = 0; idx < linkPairs.length; idx++) {
+    for (let idx = 0; idx < count; idx++) {
       const [src, dst] = linkPairs[idx];
       const p1 = satellitePositions.get(src);
       const p2 = satellitePositions.get(dst);
@@ -78,10 +81,12 @@ export default function ActiveRoute({ route }: ActiveRouteProps) {
     const pulse = Math.sin(timeRef.current * 3.5) * 0.25 + 0.75;
 
     if (lineRef.current) {
+      lineRef.current.geometry.setDrawRange(0, count * 2);
       lineRef.current.geometry.attributes.position.needsUpdate = true;
       (lineRef.current.material as THREE.LineBasicMaterial).opacity = pulse;
     }
     if (glowLineRef.current) {
+      glowLineRef.current.geometry.setDrawRange(0, count * 2);
       glowLineRef.current.geometry.attributes.position.needsUpdate = true;
       (glowLineRef.current.material as THREE.LineBasicMaterial).opacity = (1 - pulse) * 0.25;
     }
@@ -94,6 +99,7 @@ export default function ActiveRoute({ route }: ActiveRouteProps) {
       {/* Outer glow */}
       <lineSegments ref={glowLineRef}>
         <bufferGeometry>
+          {/* @ts-ignore */}
           <bufferAttribute attach="attributes-position" count={glowPositions.length / 3} array={glowPositions} itemSize={3} />
         </bufferGeometry>
         <lineBasicMaterial color={routeColor} transparent opacity={0.15} depthWrite={false} blending={THREE.AdditiveBlending} />
@@ -102,6 +108,7 @@ export default function ActiveRoute({ route }: ActiveRouteProps) {
       {/* Main beam */}
       <lineSegments ref={lineRef}>
         <bufferGeometry>
+          {/* @ts-ignore */}
           <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
         </bufferGeometry>
         <lineBasicMaterial color={routeColor} transparent opacity={0.9} depthWrite={false} blending={THREE.AdditiveBlending} />

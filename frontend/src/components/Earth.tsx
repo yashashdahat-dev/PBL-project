@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -123,9 +123,12 @@ function generateCityLightsTexture(size = 512): THREE.CanvasTexture {
   return tex;
 }
 
-export default function Earth() {
+const Earth = memo(function Earth() {
   const earthRef = useRef<THREE.Mesh>(null);
   const atmosRef = useRef<THREE.Mesh>(null);
+  
+  // Persistent rotation state to prevent resets or freezing on re-renders
+  const rotationRef = useRef(0);
 
   // Generate textures ONCE (CPU, at startup) — never runs on GPU per-frame
   const { earthTex, cityTex } = useMemo(() => ({
@@ -202,8 +205,19 @@ export default function Earth() {
   }), []);
 
   useFrame((_, delta) => {
-    // Make rotation speed visible and frame-rate independent
-    if (earthRef.current) earthRef.current.rotation.y += delta * 0.025;
+    // Clamp delta to prevent massive jumps when switching browser tabs (max 0.1s)
+    const dt = Math.min(delta, 0.1);
+    
+    // Continuously increment persistent rotation state
+    rotationRef.current += dt * 0.025;
+    
+    // Apply rotation safely to meshes
+    if (earthRef.current) {
+      earthRef.current.rotation.y = rotationRef.current;
+    }
+    if (atmosRef.current) {
+      atmosRef.current.rotation.y = rotationRef.current;
+    }
   });
 
   return (
@@ -216,4 +230,6 @@ export default function Earth() {
       </mesh>
     </group>
   );
-}
+});
+
+export default Earth;

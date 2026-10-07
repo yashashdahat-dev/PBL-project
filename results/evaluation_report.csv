@@ -1,20 +1,20 @@
 metric,value
-Average E2E Latency (ms),49.753906604005614
-Throughput (bits/sec),7680.0
-Packet Delivery Ratio (%),96.0
-Routing Stability (%),86.0
-Spectral Efficiency (bits/sec/Hz),7.68e-05
+Average E2E Latency (ms),50.65482534411795
+Throughput (bits/sec),7520.0
+Packet Delivery Ratio (%),94.0
+Routing Stability (%),89.0
+Spectral Efficiency (bits/sec/Hz),7.52e-05
 Energy Consumption (J),5.999999999999991
 Computational Overhead (%),200.0
-Fairness Index,0.9383087389847146
-Bandwidth Utilization (%),76.60180340636332
-Mission Completion Ratio (%),92.0
-Mission Satisfaction Index,0.8550455838049773
-Intent Prediction Accuracy (%),97.0
-Resource Allocation Efficiency (%),82.38743897145315
-Mission Priority Preservation (%),94.0
-Service Continuity (%),89.59228102817039
-Dynamic Resilience (%),94.83811958320328
-Swarm Coordination Efficiency (%),92.0
+Fairness Index,0.9389244525070087
+Bandwidth Utilization (%),74.35345078182888
+Mission Completion Ratio (%),95.0
+Mission Satisfaction Index,0.857444640475916
+Intent Prediction Accuracy (%),92.0
+Resource Allocation Efficiency (%),83.21257622269137
+Mission Priority Preservation (%),96.0
+Service Continuity (%),89.38603181361837
+Dynamic Resilience (%),103.49417405276111
+Swarm Coordination Efficiency (%),97.0
 Learning Convergence Speed (steps),N/A
 Computational Complexity (Q-table entries),6400

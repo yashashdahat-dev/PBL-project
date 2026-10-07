@@ -1,11 +1,11 @@
-import React from 'react';
+import { memo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import Earth from './Earth';
 import Constellation from './Constellation';
 
-export default function Scene() {
+const Scene = memo(function Scene() {
   return (
     <Canvas
       // Cap DPR at 1.5 to halve pixel fill on HiDPI/Retina screens
@@ -40,8 +40,7 @@ export default function Scene() {
         enableRotate={true}
         minDistance={5}
         maxDistance={22}
-        autoRotate={true}
-        autoRotateSpeed={0.12}
+        autoRotate={false}
         enableDamping={true}
         dampingFactor={0.06}
         // Throttle camera update events
@@ -49,5 +48,7 @@ export default function Scene() {
       />
     </Canvas>
   );
-}
+});
+
+export default Scene;
 

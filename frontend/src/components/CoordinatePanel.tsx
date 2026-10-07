@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useSimulationStore } from '../hooks/useSimulationStore';
 
 export default function CoordinatePanel() {

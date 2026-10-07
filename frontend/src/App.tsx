@@ -4,7 +4,7 @@ import HUDMetrics from './components/HUDMetrics';
 import EventTicker from './components/EventTicker';
 import CoordinatePanel from './components/CoordinatePanel';
 import MissionPerformance from './components/MissionPerformance';
-import { useSimulationStore, intentColors, intentLabels, type Intent } from './hooks/useSimulationStore';
+import { useSimulationStore, intentColors, intentLabels } from './hooks/useSimulationStore';
 
 const API = 'http://localhost:8000';
 const WS  = 'ws://localhost:8001';
@@ -72,7 +72,7 @@ function App() {
         setDestination('P3_S3');
         addEvent('Backend offline — running in demo mode (no routing)', 'info');
       });
-  }, []);
+  }, [setSatellites, setLinks, setSource, setDestination, addEvent]);
 
   // WebSocket live updates
   useEffect(() => {
@@ -105,7 +105,7 @@ function App() {
 
     connect();
     return () => { ws?.close(); clearTimeout(retryTimeout); };
-  }, [backendOnline]);
+  }, [backendOnline, addEvent, setActiveRoute, addFailedLink, removeFailedLink]);
 
   // Poll network links every 5s to sync failures
   useEffect(() => {
@@ -117,7 +117,7 @@ function App() {
         .catch(() => {});
     }, 5000);
     return () => clearInterval(poll);
-  }, [backendOnline]);
+  }, [backendOnline, setLinks]);
 
   const handleCalculateRoute = useCallback(async () => {
     if (!source || !destination || isRouting) return;
@@ -153,7 +153,7 @@ function App() {
     } finally {
       setIsRouting(false);
     }
-  }, [source, destination, intent, isRouting]);
+  }, [source, destination, intent, isRouting, setActiveRoute, addEvent]);
 
   const handleFailLink = useCallback(async () => {
     if (!source || !destination) return;
@@ -172,7 +172,7 @@ function App() {
       addFailedLink(key);
       addEvent(`ISL FAILED: ${source} ↔ ${destination}`, 'failure');
     }
-  }, [source, destination]);
+  }, [source, destination, addEvent, addFailedLink]);
 
   const handleRecoverLink = useCallback(async () => {
     if (!source || !destination) return;
@@ -191,7 +191,7 @@ function App() {
       removeFailedLink(key);
       addEvent(`ISL RECOVERED: ${source} ↔ ${destination}`, 'recovery');
     }
-  }, [source, destination]);
+  }, [source, destination, addEvent, removeFailedLink]);
 
   const handleRandomFailure = useCallback(async () => {
     try {
@@ -199,7 +199,7 @@ function App() {
     } catch {
       addEvent('Random failure: backend offline', 'failure');
     }
-  }, []);
+  }, [addEvent]);
 
   const handleTrainMore = useCallback(async () => {
     if (isTraining) return;
@@ -218,7 +218,7 @@ function App() {
     } finally {
       setIsTraining(false);
     }
-  }, [isTraining]);
+  }, [isTraining, addEvent]);
 
   const allSatelliteIds = satellites.map(s => s.id).sort();
 

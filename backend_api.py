@@ -122,13 +122,23 @@ def calculate_route():
 
     # Run the cognitive Q-routing through the environment to update all global metrics
     from simulation.traffic import TrafficFlow
-    flow = TrafficFlow(src, dst, 100.0, 5.0, target_intent) # 100kb, priority 5
-    if target_intent == StandardIntents.LOW_LATENCY:
-        flow.deadline_ms = 50.0
-    elif target_intent == StandardIntents.EARTH_OBSERVATION:
-        flow.deadline_ms = 500.0
-    elif target_intent == StandardIntents.SECURE_MISSION:
-        flow.deadline_ms = 200.0
+    deadline = 200.0
+    if target_intent.priority >= 8:
+        deadline = 50.0
+    elif target_intent.priority >= 4:
+        deadline = 200.0
+    else:
+        deadline = 500.0
+
+    flow = TrafficFlow(
+        source_id=src,
+        dest_id=dst,
+        intent=target_intent,
+        packet_size_kb=100.0,
+        priority=target_intent.priority,
+        deadline_ms=deadline,
+        application_category=target_intent.application_category
+    )
         
     res = env.process_traffic_batch([flow], router, global_metrics)
     path = res["paths"][0] if res["paths"] else [src]

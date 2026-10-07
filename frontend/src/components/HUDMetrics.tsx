@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSimulationStore } from '../hooks/useSimulationStore';
 
 export default function HUDMetrics() {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSimulationStore } from '../hooks/useSimulationStore';
 
 const typeIcons: Record<string, string> = {
@@ -37,7 +37,7 @@ export default function EventTicker() {
         ) : (
           events.map((ev, i) => (
             <div
-              key={ev.ts}
+              key={`${ev.ts}-${i}`}
               className="ticker-item"
               style={{
                 color: typeColors[ev.type],

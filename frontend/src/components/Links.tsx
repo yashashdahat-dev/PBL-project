@@ -25,7 +25,11 @@ export default function Links({ links }: LinksProps) {
     const failed: [string, string][] = [];
     for (const [a, b] of links) {
       const key = [a, b].sort().join('-');
-      failedLinks.has(key) ? failed.push([a, b]) : normal.push([a, b]);
+      if (failedLinks.has(key)) {
+        failed.push([a, b]);
+      } else {
+        normal.push([a, b]);
+      }
     }
     return { normalLinks: normal, failedLinkPairs: failed };
   }, [links, failedLinks]);
@@ -69,7 +73,8 @@ export default function Links({ links }: LinksProps) {
     <group>
       {/* Normal links */}
       <lineSegments ref={normalLineRef}>
-        <bufferGeometry>
+        <bufferGeometry key={`normal-${normalPositions.length}`}>
+          {/* @ts-ignore */}
           <bufferAttribute attach="attributes-position" count={normalPositions.length / 3} array={normalPositions} itemSize={3} />
         </bufferGeometry>
         <lineBasicMaterial color="#4287f5" transparent opacity={0.2} depthWrite={false} blending={THREE.AdditiveBlending} />
@@ -78,7 +83,8 @@ export default function Links({ links }: LinksProps) {
       {/* Failed links */}
       {failedLinkPairs.length > 0 && (
         <lineSegments ref={failedLineRef}>
-          <bufferGeometry>
+          <bufferGeometry key={`failed-${failedPositions.length}`}>
+            {/* @ts-ignore */}
             <bufferAttribute attach="attributes-position" count={failedPositions.length / 3} array={failedPositions} itemSize={3} />
           </bufferGeometry>
           <lineBasicMaterial color="#ff2244" transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />

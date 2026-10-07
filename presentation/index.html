@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I-MACSI Project Presentation & Evaluation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #070d1e;
+      --bg-card: #0f1e3d;
+      --bg-card-hover: #152952;
+      --cyan: #00e5ff;
+      --blue: #4e95ff;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --purple: #a855f7;
+      --red: #ef4444;
+      --text-white: #ffffff;
+      --text-muted: #a0b9dc;
+      --border-color: rgba(0, 229, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      height: 56px;
+      background: rgba(15, 30, 61, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #00e5ff, #0052ff);
+      color: #000;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--cyan);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Slide Container */
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(40px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    /* Slide Header */
+    .slide-tag {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .slide-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .slide-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .card:hover {
+      border-color: var(--cyan);
+      background: var(--bg-card-hover);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title.cyan { color: var(--cyan); }
+    .card-title.amber { color: var(--amber); }
+    .card-title.green { color: var(--green); }
+    .card-title.purple { color: var(--purple); }
+
+    ul.card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    ul.card-list li {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    ul.card-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-weight: bold;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    ul.card-list li strong {
+      color: var(--text-white);
+    }
+
+    .code-box {
+      background: #040814;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      line-height: 1.6;
+    }
+
+    .img-preview {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #040814;
+    }
+
+    /* Comparison Table */
+    table.comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    table.comp-table th {
+      background: #142850;
+      color: var(--cyan);
+      padding: 12px 14px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--cyan);
+    }
+
+    table.comp-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    table.comp-table tr.highlight {
+      background: rgba(0, 229, 255, 0.08);
+      font-weight: 600;
+    }
+
+    table.comp-table tr.highlight td {
+      color: var(--green);
+    }
+
+    table.comp-table tr.highlight td:first-child {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    /* Stat Box */
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Speaker Notes Bar */
+    footer {
+      height: 42px;
+      background: #050a17;
+      border-top: 1px solid rgba(0, 229, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .hint {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="brand">
+      <span class="brand-badge">I-MACSI</span>
+      <span class="brand-title">LEO Mega-Constellation Cognitive Swarm Intelligence</span>
+    </div>
+    <div class="controls">
+      <button class="nav-btn" onclick="prevSlide()">◀ Prev</button>
+      <span class="slide-counter" id="slide-num">1 / 12</span>
+      <button class="nav-btn" onclick="nextSlide()">Next ▶</button>
+      <button class="nav-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <a href="../start.bat" class="nav-btn" style="text-decoration:none; background: linear-gradient(135deg,#10b981,#00e5ff); color:#000;">🚀 Launch Prototype</a>
+    </div>
+  </header>
+
+  <!-- Main Slide Deck -->
+  <main id="slide-container">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide active">
+      <span class="slide-tag">PROJECT DEFENSE & EVALUATION 2026</span>
+      <h1 class="slide-title" style="font-size: 44px; line-height: 1.2;">
+        I-MACSI: Intent-Aware Multi-Agent<br />
+        <span style="color: var(--cyan);">Cognitive Swarm Intelligence for LEO Networks</span>
+      </h1>
+      <p class="slide-subtitle" style="font-size: 20px;">
+        Autonomous Self-Organizing Q-Routing, Semantic Intent Extraction, and Dynamic Fault Recovery for Next-Generation Low Earth Orbit Constellations
+      </p>
+      
+      <div class="grid-3" style="margin-top: 20px;">
+        <div class="card">
+          <div class="card-title cyan">🛰️ Autonomous Swarm</div>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Transforms satellites from dumb forwarding nodes into intelligent cognitive agents with decentralized multi-agent Q-learning and FedMARL consensus.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title purple">🧠 8D Intent Vector</div>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Transforms natural language mission requests into dynamic 8D optimization parameters across Latency, Bandwidth, Loss, Security, Energy, and Compute.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title green">🌐 3D Digital Twin</div>
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Full-stack interactive prototype in React 18, Three.js, and Python Flask with real-time fault injection and live packet animation.
+          </p>
+        </div>
+      </div>
+
+      <div class="stat-row" style="margin-top: 24px;">
+        <div class="stat-box">
+          <div class="stat-val">+36.1%</div>
+          <div class="stat-label">PDR Resilience vs Dijkstra</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">83.0% vs 61.0%</div>
+          <div class="stat-label">Intent Ablation Gain</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">&lt; 1.2s</div>
+          <div class="stat-label">Autonomous Self-Healing</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">11 Missions</div>
+          <div class="stat-label">Standard Intent Profiles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Motivation -->
+    <div class="slide">
+      <span class="slide-tag">PROJECT BACKGROUND & MOTIVATION</span>
+      <h2 class="slide-title">The LEO Mega-Constellation Revolution & Challenges</h2>
+      <p class="slide-subtitle">Why classical terrestrial routing fails in dynamic space environments</p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title cyan">1. Mega-Constellation Scale</div>
+          <ul class="card-list">
+            <li><strong>10,000+ Satellites:</strong> Massive deployment by Starlink, Kuiper, and OneWeb.</li>
+            <li><strong>Orbital Velocity:</strong> Cruising at ~7.8 km/s at 550 km altitude.</li>
+            <li><strong>90-Min Orbit:</strong> Satellites traverse the planet every 90 minutes.</li>
+            <li><strong>Optical ISLs:</strong> High-bandwidth laser inter-satellite links form dynamic meshes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title amber">2. Space Physical Reality</div>
+          <ul class="card-list">
+            <li><strong>Topological Drift:</strong> Relative geometry shifts every 2 to 5 minutes.</li>
+            <li><strong>Radiation & Flares:</strong> Sudden solar events knock out optical transceivers.</li>
+            <li><strong>Debris Avoidance:</strong> Collision avoidance maneuvers sever active links.</li>
+            <li><strong>Propagation Delays:</strong> Central ground control suffers 150-300ms round-trips.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title green">3. Heterogeneous Missions</div>
+          <ul class="card-list">
+            <li><strong>Disaster Response:</strong> Demands ultra-low latency & zero packet drop.</li>
+            <li><strong>Earth Observation:</strong> Demands massive multi-gigabit throughput.</li>
+            <li><strong>Secure Comms:</strong> Requires strict crypto-enclaves & trusted paths.</li>
+            <li><strong>Maritime / IoT:</strong> Intermittent burst packets with strict energy budgets.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Problem Statement -->
+    <div class="slide">
+      <span class="slide-tag">RESEARCH GAPS & NOVELTY</span>
+      <h2 class="slide-title">Problem Statement & Comparison with Existing Routing</h2>
+      <p class="slide-subtitle">Systematic comparison against traditional and centralized space routing paradigms</p>
+      
+      <div class="card" style="padding: 16px;">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Routing Protocol</th>
+              <th>Failure Resilience</th>
+              <th>QoS & Intent Differentiation</th>
+              <th>Control Overhead</th>
+              <th>LEO Scalability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Shortest Path (Dijkstra)</strong></td>
+              <td>Severe (Black-holes upon ISL cut)</td>
+              <td>None (Hop/Distance only)</td>
+              <td>High full recalculation</td>
+              <td>Poor (Static snapshots)</td>
+            </tr>
+            <tr>
+              <td><strong>Reactive AODV / Flood</strong></td>
+              <td>Moderate (High packet drop)</td>
+              <td>Poor (Best-effort forwarding)</td>
+              <td>Massive (Floods control packets)</td>
+              <td>Low (Bandwidth saturation)</td>
+            </tr>
+            <tr>
+              <td><strong>Centralized IBN-SDN</strong></td>
+              <td>Slow (Requires Ground Loop)</td>
+              <td>High (Controlled on Earth)</td>
+              <td>Very High (ISL telemetry sync)</td>
+              <td>Lagging (150-300ms ground latency)</td>
+            </tr>
+            <tr class="highlight">
+              <td><strong>I-MACSI (Proposed)</strong></td>
+              <td>Autonomous (&lt;1.2s Local Healing)</td>
+              <td>8D Dynamic Semantic Optimization</td>
+              <td>Near-Zero (Gossip TTL=2)</td>
+              <td>Ultra-High (Distributed Swarm)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Architecture -->
+    <div class="slide">
+      <span class="slide-tag">SYSTEM ARCHITECTURE & MODEL</span>
+      <h2 class="slide-title">I-MACSI Architecture: The 3-Tier Cognitive Framework</h2>
+      <p class="slide-subtitle">Hierarchical decomposition from mission semantics down to optical orbital links</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
+        <div class="card" style="border-left: 4px solid var(--cyan);">
+          <div class="card-title cyan">Tier 1: Mission Intent Understanding Layer (Semantic NLP & 8D Vector)</div>
+          <ul class="card-list">
+            <li>Extracts semantic requirements from high-level mission descriptions.</li>
+            <li>Generates quantitative 8D Intent Vector [Latency, Throughput, Reliability, Congestion, Energy, Security, Coverage, Compute].</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--blue);">
+          <div class="card-title" style="color: var(--blue);">Tier 2: Cognitive Swarm Agent Layer (Decentralized Q-Routing & FedMARL)</div>
+          <ul class="card-list">
+            <li>Autonomous Sense-Decide-Act-Learn loop on every satellite with dynamic reward shaping.</li>
+            <li>Intent Dissemination Protocol (TTL=2) and federated policy aggregation across orbital planes.</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--green);">
+          <div class="card-title green">Tier 3: Dynamic Physical Constellation & ISL Execution Layer</div>
+          <ul class="card-list">
+            <li>Multi-plane Walker Delta grid topology with dynamic link latency, queue depths, SNR, and bit error rates.</li>
+            <li>Per-hop laser beam allocation, Tx power tuning, cipher selection, and gateway offloading.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: 8D Intent Vector -->
+    <div class="slide">
+      <span class="slide-tag">SEMANTIC INTENT MODEL</span>
+      <h2 class="slide-title">8D Mission Intent Vector Formulation & NLP Engine</h2>
+      <p class="slide-subtitle">Bridging natural language mission objectives with quantitative reinforcement learning weights</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title cyan">8-Dimensional Vector Definition</div>
+          <div class="code-box">
+            I_vec = [ w_lat, w_thr, w_rel, w_cng, w_eng, w_sec, w_cov, w_cmp ]
+          </div>
+          <ul class="card-list">
+            <li><strong>w_lat (Latency):</strong> Urgency & propagation delay minimization.</li>
+            <li><strong>w_thr (Throughput):</strong> Bandwidth capacity reservation factor.</li>
+            <li><strong>w_rel (Reliability):</strong> Packet loss tolerance & forward error correction.</li>
+            <li><strong>w_cng (Congestion):</strong> Buffer occupancy bypass weight.</li>
+            <li><strong>w_eng (Energy):</strong> Battery & solar power conservation factor.</li>
+            <li><strong>w_sec (Security):</strong> Encryption level & trusted node whitelisting.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title purple">11 Standard Missions & NLP Parsing</div>
+          <ul class="card-list">
+            <li><strong>CRITICAL_DISASTER:</strong> w_lat=0.95, w_rel=0.90, w_cng=0.85</li>
+            <li><strong>EARTH_OBSERVATION:</strong> w_thr=0.95, w_cmp=0.80, w_lat=0.20</li>
+            <li><strong>SECURE_MISSION:</strong> w_sec=1.00, w_rel=0.90, w_lat=0.70</li>
+            <li><strong>AUTONOMOUS_MARITIME:</strong> w_cov=0.90, w_eng=0.75</li>
+          </ul>
+          <div class="code-box" style="margin-top: 10px; color: var(--green);">
+            # Live NLP Extraction Example:<br />
+            Input: "Urgent wildfire sensor alert in remote zone"<br />
+            &gt;&gt; Intent: CRITICAL_DISASTER (Priority: 10)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Cognitive Q-Routing -->
+    <div class="slide">
+      <span class="slide-tag">LEARNING ALGORITHMS & RL FORMULATION</span>
+      <h2 class="slide-title">Decentralized Q-Routing & Dynamic Reward Shaping</h2>
+      <p class="slide-subtitle">Autonomous reinforcement learning with dynamic mission modulation</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title cyan">Mathematical RL Formulation</div>
+          <div class="code-box">
+            # Distributed Bellman Equation:<br />
+            Q(s,a) &larr; Q(s,a) + &alpha; [ R_intent + &gamma; max Q(s',a') - Q(s,a) ]<br /><br />
+            # Dynamic Intent Reward Shaping:<br />
+            R_intent = - [ w_lat&middot;T_delay + w_cng&middot;C_load + w_rel&middot;Loss + w_sec&middot;Pen ]
+          </div>
+          <ul class="card-list" style="margin-top: 10px;">
+            <li><strong>State Space (s):</strong> Local satellite ID + neighbor queue depths.</li>
+            <li><strong>Action Space (a):</strong> Selecting next-hop ISL neighbor (N, S, E, W).</li>
+            <li><strong>Learning Hyperparameters:</strong> &alpha; = 0.1, &gamma; = 0.9, &epsilon;-decay = 0.995.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--blue);">Empirical Learning Convergence</div>
+          <img src="../results/figures/5_learning_convergence.png" class="img-preview" alt="Learning Convergence" onerror="this.style.display='none'" />
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Swarm policy stabilizes within 200 packets, achieving optimal delivery efficiency.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Dissemination & Consensus -->
+    <div class="slide">
+      <span class="slide-tag">DISTRIBUTED CONSENSUS & PROACTION</span>
+      <h2 class="slide-title">Intent Dissemination Protocol & FedMARL Consensus</h2>
+      <p class="slide-subtitle">Swarm neighborhood awareness and inter-plane collaborative learning</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title cyan">Gossip-Style Intent Dissemination</div>
+          <ul class="card-list">
+            <li><strong>Bounded TTL (TTL=2):</strong> Disseminates active mission intents strictly to 2-hop neighborhood to prevent broadcast storms.</li>
+            <li><strong>Proactive Queue Clearance:</strong> Downstream nodes clear packet queues before high-priority flows arrive.</li>
+            <li><strong>Adaptive Power Allocation:</strong> Satellites increase laser transmitter power for high-reliability missions.</li>
+            <li><strong>Overhead:</strong> Consumes &lt; 0.05% of total link bandwidth capacity.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title green">Federated Swarm Learning (FedMARL)</div>
+          <ul class="card-list">
+            <li><strong>Orbital Plane Aggregation:</strong> Satellites periodically exchange Q-table policy parameters with orbital neighbors.</li>
+            <li><strong>Accelerated Wisdom:</strong> Knowledge of congested ground stations or degraded links spreads rapidly without central coordination.</li>
+            <li><strong>Payload Privacy:</strong> Only mathematical Q-gradients are exchanged; user payloads remain strictly encrypted and isolated.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Self-Healing Fault Recovery -->
+    <div class="slide">
+      <span class="slide-tag">FAULT TOLERANCE & RESILIENCE</span>
+      <h2 class="slide-title">Autonomous Self-Healing Swarm & Fault Recovery</h2>
+      <p class="slide-subtitle">Real-time local link failure sensing and sub-second autonomous bypass routing</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title amber">Autonomous Self-Healing Loop</div>
+          <ul class="card-list">
+            <li><strong>1. Real-Time Sensing:</strong> Satellite senses laser loss-of-signal and sets ISL state to <code>FAILED</code>.</li>
+            <li><strong>2. Massive Negative Reward:</strong> Action receives instant -100 penalty in Q-table.</li>
+            <li><strong>3. Dynamic Bypass Routing:</strong> Autonomous Q-search discovers alternate multi-plane paths in &lt; 1.2s.</li>
+            <li><strong>4. Zero Control Loopback:</strong> No round-trip delay to Earth ground controllers required.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title green">Self-Healing Reroute Snapshot</div>
+          <img src="../autonomous_swarm_recovery_path_p0_s0__p1_s0__p1_s1__p0_s1__p3_s1__p2_s1__p2_s0__p3_s0__p3_s3__p2_s3_snapshot.png" class="img-preview" alt="Recovery Snapshot" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Benchmark Results -->
+    <div class="slide">
+      <span class="slide-tag">EMPIRICAL RESULTS & METRICS</span>
+      <h2 class="slide-title">Experimental Evaluation: Benchmark Comparison</h2>
+      <p class="slide-subtitle">Rigorous empirical comparison against classical Dijkstra and Basic Q-Routing</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title cyan">Baseline Performance Comparison</div>
+          <img src="../results/figures/8_baseline_comparison.png" class="img-preview" alt="Baseline Comparison" onerror="this.style.display='none'" />
+        </div>
+        <div class="card">
+          <div class="card-title green">Key Empirical Findings</div>
+          <ul class="card-list">
+            <li><strong>Packet Delivery Ratio (PDR):</strong> I-MACSI maintains <strong>83.0%</strong> under catastrophic failure vs <strong>58.0%</strong> (Basic Q-Routing) and <strong>34.2%</strong> (Dijkstra).</li>
+            <li><strong>Latency Reduction:</strong> 41.8% lower latency under high congestion loads due to proactive queue bypass.</li>
+            <li><strong>Throughput:</strong> 2.8x higher throughput for Earth Observation bulk data flows.</li>
+            <li><strong>Fault Recovery Speed:</strong> Reaches new optimal path in &lt; 1.2 seconds.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Ablation & Scalability -->
+    <div class="slide">
+      <span class="slide-tag">VALIDATION & SCALABILITY</span>
+      <h2 class="slide-title">Ablation Study & Constellation Scalability Analysis</h2>
+      <p class="slide-subtitle">Isolating algorithmic contributions and validating computational complexity</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title purple">Component Ablation Study</div>
+          <img src="../results/figures/9_ablation_study.png" class="img-preview" alt="Ablation Study" onerror="this.style.display='none'" />
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+            Intent awareness contributes +22% PDR; Cognitive state sharing contributes +7% PDR.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title cyan">Constellation Scalability (16 to 128 Nodes)</div>
+          <img src="../results/figures/15_scalability_comparison.png" class="img-preview" alt="Scalability Comparison" onerror="this.style.display='none'" />
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+            Per-hop complexity remains O(k&middot;|A|), easily executable on radiation-hardened space MCUs (RAD750/LEON4).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Digital Twin Prototype -->
+    <div class="slide">
+      <span class="slide-tag">PROTOTYPE IMPLEMENTATION</span>
+      <h2 class="slide-title">Digital Twin Prototype & Live 3D Working Model</h2>
+      <p class="slide-subtitle">Interactive full-stack mission operations and telemetry HUD</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title cyan">Full-Stack Implementation</div>
+          <ul class="card-list">
+            <li><strong>Frontend (React 18 + Three.js + Vite):</strong> 3D Earth, orbital planes, dynamic satellite nodes, laser beams, and glowing packet paths.</li>
+            <li><strong>Backend (Python 3.13 + Flask + WebSockets):</strong> Real-time Q-routing solver, dynamic telemetry publisher, and failure injector.</li>
+            <li><strong>Interactive Features:</strong>
+              <br />• One-click ISL failure injection
+              <br />• Live natural language intent extractor
+              <br />• Real-time HUD metrics (PDR, Latency, Stability)
+            </li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--blue);">3D Digital Twin View</div>
+          <img src="../results/figures/3d_prefailure_training_complete_snapshot.png" class="img-preview" alt="3D Digital Twin" onerror="this.style.display='none'" />
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Live 3D interactive constellation running at 60 FPS.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Conclusion & Viva Q&A -->
+    <div class="slide">
+      <span class="slide-tag">PROJECT CONCLUSION & DEFENSE</span>
+      <h2 class="slide-title">Summary, Viva Defense Q&A & Future Roadmap</h2>
+      <p class="slide-subtitle">Research conclusions, anticipated examiner questions, and next technical milestones</p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title green">Key Contributions</div>
+          <ul class="card-list">
+            <li>Novel 8D Mission Intent framework for satellite networks.</li>
+            <li>Dynamic Reward Shaping in multi-agent Q-learning.</li>
+            <li>Bounded Gossip Intent Dissemination protocol.</li>
+            <li>Complete working 3D Digital Twin simulation.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title cyan">Viva Defense Q&A</div>
+          <ul class="card-list">
+            <li><strong>Q: Why Tabular Q-Learning?</strong><br />A: Fits within low-power radiation-hardened space MCU RAM/CPU limits.</li>
+            <li><strong>Q: How are loops avoided?</strong><br />A: Discount &gamma;=0.9 and hop penalty prevent cyclic traps.</li>
+            <li><strong>Q: Control overhead?</strong><br />A: Bounded TTL=2 consumes &lt;0.05% bandwidth.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title purple">Future Roadmap</div>
+          <ul class="card-list">
+            <li>Deep Q-Networks (DQN) with TinyML space hardware quantization.</li>
+            <li>Optical Laser Pointing & Doppler compensation integration.</li>
+            <li>Hardware-in-the-Loop testbed with CubeSat SDRs.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Footer Bar -->
+  <footer>
+    <div><span class="hint">Keyboard Controls:</span> [ &larr; / &rarr; ] Navigate Slides &nbsp;|&nbsp; [ F ] Fullscreen &nbsp;|&nbsp; [ Space ] Next Slide</div>
+    <div>I-MACSI &copy; 2026 | Low Earth Orbit Cognitive Swarm Routing</div>
+  </footer>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const counter = document.getElementById('slide-num');
+
+    function updateSlides() {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === currentSlide);
+      });
+      counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlides();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlides();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
