@@ -1,0 +1,21 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & Editor temporary files
+.vscode/
+.idea/
+tempCodeRunnerFile.py
+*.tmp
+*.log
+
+# Windows thumbnail cache
+Thumbs.db
+ehthumbs.db
